@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Essay</title>
+    <style>
+    div {
+      margin: auto;
+      padding: 15px;
+      width: 400;
+      padding: 10;
+    }
+    </style>
+</head>
+<body>
+    <div>
+      <h1 style="text-align:center">Essay</h1>
+      <h2 style="text-align:center"><b>INTERNET OF THINGS</b></h2>
+      <h2 style="text-align:center">Develop flame detection system</h2>
+      <br>
+      <p><b>INSTRUCTOR:</b> Assoc. Prof. Do Thanh Nghi</p>
+      <p><b>STUDENTS:</b></p>
+      <p>Tran Thi Vang Y    - B1609621</p>
+      <p>Tran Dao Thi My An - B1610658</p>
+
+      <h1>FLAME DETECTION</h><br>
+          <h2>Status</h2> <input type="text" size="6" id="status"><br>
+    </div>
+
+      <script type="text/javascript">
+        function httpGetAsync(theUrl, callback) {
+                    var xmlHttp = new XMLHttpRequest();
+                    xmlHttp.onreadystatechange = function() {
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                    callback(JSON.parse(xmlHttp.responseText));
+            }
+            xmlHttp.open("GET", theUrl, true); // true for asynchronous
+            xmlHttp.send(null);
+        }
+
+        window.onload = function() {
+
+            var updateInterval = 2000; // update data every 2 seconds
+            var time = new Date(); // get current time
+
+            var updateDetect = function() {
+                httpGetAsync('/get', function(data) {
+
+                    // get data from localhost:8000/get into textbox
+                    if (data[0].warn == 0.00) {
+                    document.getElementById("status").innerHTML = "No flame detected. Stay cool!";
+                    }
+                    else {
+                      document.getElementById("status").innerHTML = "FLAME DETECTED!!! TAKE ACTION";
+                    }
+
+                    // print into console of web browser
+                    console.log(data);
+                    // update time and get data of temp and humd from server
+                    time.setTime(time.getTime() + updateInterval);
+                });
+            };
+            updateDetect();
+            setInterval(function() { // update graph after updateInterval
+                updateDetect()
+            }, updateInterval);
+        }
+      </script>
+</body>
+</html>

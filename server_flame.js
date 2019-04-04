@@ -17,8 +17,7 @@ function requestHandler(request, response) {
     //-----------------------------------------------------------------------------------------
     if (pathname == '/update') {            // update new data and send to client
         var newData = {
-            temp: queryData.temp,
-            humd: queryData.humd,
+            warn: queryData.warn,
             time: new Date()                // get current time
         };
         db.push(newData);                   // push data to array
@@ -33,7 +32,7 @@ function requestHandler(request, response) {
         db = [];
     //-----------------------------------------------------------------------------------------
     } else {
-        fs.readFile('./index.html', function(error, content) { //read file html
+        fs.readFile('./flame_detection.html', function(error, content) { //read file html
             response.writeHead(200, {
                 'Content-Type': 'text/html'
             });

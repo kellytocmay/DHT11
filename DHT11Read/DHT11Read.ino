@@ -1,33 +1,31 @@
-#include <DHT.h>            // Khai báo sử dụng thư viện DHT
-#include <ESP8266WiFi.h>    // Khai báo sử dụng thư viện ESP8266WiFi.h để thiết lập chế độ HTTP client cho ESP8266
-#define DHTPIN 4            // Chân dữ liệu của DHT11 kết nối với GPIO4 của ESP8266
-#define DHTTYPE DHT11       // Loại DHT được sử dụng
+#include <DHT.h>            // declare using library DHT
+#include <ESP8266WiFi.h>    //declare using library ESP8266WiFi.h to set up HTTP client mode for board ESP8266
+#define DHTPIN 5           // data pins of DHT11 connect to GPI005 of ESP8266
+#define DHTTYPE DHT11       // Type of library DHT be used
 
 DHT dht(DHTPIN, DHTTYPE);
-WiFiClient client;          // Tạo 1 biến client thuộc kiểu WiFiClient
-const char* ssid = "YOUR-WIFI-SSID";      // Tên mạng Wifi được chỉ định sẽ kết nối (SSID)
-const char* password = "YOUR-WIFI-PASS";  // Password của mạng Wifi được chỉ định sẽ kết nối
-const char* server = "Your-local-IP";     // Địa chỉ IP của máy khi truy cập cùng mạng WiFi
-const int port = 8000;                    // Port của server đã mở
-const int sendingInternval = 2 * 1000;    // Biến cập nhật dữ liệu sau mỗi 2s
+WiFiClient client;          // create an variable client has datatype WiFiClient
+const char* ssid = "yyy";      // the wireless network name (SSID)
+const char* password = "VangY@0306";  // Password of Wifi network will be connected 
+const char* server = "192.168.43.36";     // IP address of computer when connecting with the wifi network
+const int port = 8000;                    // Port of opened server 
+const int sendingInternval = 2 * 1000;    // variable update data after every 2s
+
 
 void setup() {
   Serial.begin(115200);
-  dht.begin();                            // Khởi tạo DHT1 11 để truyền nhận dữ liệu
+  dht.begin();                            // Create DHT11 to send - recieve data
   Serial.println("Connecting");
 
-  // Thiết lập ESP8266 là Station và kết nối đến Wifi. in ra dấu `.` trên terminal nếu chưa được kết nối
+  // set ESP8266 is Station and connest to Wifi. display the dots `.` on terminal if it is not connected
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
     delay(100);
   }
-  Serial.println("\r\nWiFi connected");
 }
-
 void loop() {
-
-// Đọc gía trị nhiệt độ (độ C), độ ẩm. Xuất ra thông báo lỗi và thoát ra nếu dữ liệu không phải là số
+// Read value of Temperature(celcius),Humidity.If data is not a number, displaying error and exit.
   float temp = dht.readTemperature();
   float humi = dht.readHumidity();
   if (isnan(temp) || isnan(humi)) {
@@ -35,16 +33,17 @@ void loop() {
     return;
   }
 
-  if (client.connect(server, port)) {       // Khởi tạo kết nối đến server thông qua IP và PORT đã mở
+  if (client.connect(server, port)) {       // create an connect to server through opened IP and Port.
   //---------------------------------------------------------------------------------------
     String req_uri = "/update?temp=" + String(temp, 1) + "&humd=" + String(humi, 1);
-    client.print("GET " + req_uri + " HTTP/1.1\n" + "Host: "+ server +"\n" + "Connection: close\n" + "Content-Length: 0\n" +"\n\n");   
+    client.print("GET " + req_uri + " HTTP/1.1\n" + "Host: "+ server +"\n" +
+                 "Connection: close\n" + "Content-Length: 0\n" +"\n\n");   
   //---------------------------------------------------------------------------------------
 
-  // temp, humi chuyển từ định dạng float sang định dạng string và in ra màn hình serial      // terminal trên Arduino.
+  // temp, humi change from "float" into "string" and display serial     // terminal on Arduino.
     Serial.printf("Nhiet do %s - Do am %s\r\n", String(temp, 1).c_str(), String(humi, 1).c_str());
   }
-  client.stop();                          // Ngắt kết nối đến server
+  client.stop();                          // disconnect to server
 
   delay(sendingInternval);
 }
